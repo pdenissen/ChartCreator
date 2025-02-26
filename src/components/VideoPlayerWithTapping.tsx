@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/lib/supabase";
 import type YT from "youtube-player";
+import { YouTubePlayer } from "@/components/YouTubePlayer";
+import type { YouTubeEvent, YouTubePlayer as YTPlayer } from "@/types/youtube";
 
 interface Bar {
   time: number;
@@ -32,35 +34,13 @@ export function VideoPlayerWithTapping({
   const [songTitle, setSongTitle] = useState(existingChart?.song_title || "");
   const [isSaving, setIsSaving] = useState(false);
   const playerRef = useRef<YT.Player | null>(null);
-  const playerContainerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const loadYouTubePlayer = () => {
-      if (window.YT && window.YT.Player && playerContainerRef.current) {
-        playerRef.current = new window.YT.Player(playerContainerRef.current, {
-          height: "360",
-          width: "640",
-          videoId: videoId,
-          events: {
-            onStateChange: onPlayerStateChange,
-          },
-        });
-      } else {
-        setTimeout(loadYouTubePlayer, 100);
-      }
-    };
-
-    loadYouTubePlayer();
-
-    return () => {
-      if (playerRef.current) {
-        playerRef.current.destroy();
-      }
-    };
-  }, [videoId]);
-
-  const onPlayerStateChange = (event: YT.OnStateChangeEvent) => {
+  const onPlayerStateChange = (event: YouTubeEvent) => {
     setIsPlaying(event.data === window.YT.PlayerState.PLAYING);
+  };
+
+  const onPlayerReady = (player: YTPlayer) => {
+    playerRef.current = player;
   };
 
   const handleTap = () => {
@@ -148,7 +128,11 @@ export function VideoPlayerWithTapping({
 
   return (
     <div className="space-y-4">
-      <div ref={playerContainerRef} />
+      <YouTubePlayer
+        videoId={videoId}
+        onStateChange={onPlayerStateChange}
+        onPlayerReady={onPlayerReady}
+      />
       <Input
         type="text"
         placeholder="Enter song title"
