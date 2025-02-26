@@ -85,9 +85,9 @@ export function VideoControls({
           <ForwardIcon className="w-6 h-6" />
         </button>
 
-        <div className="flex-1 flex items-center gap-2 relative">
+        <div className="flex-1 flex items-center justify-between relative">
           <span className="text-sm">{formatTime(currentTime)}</span>
-          <div className="flex-1 relative">
+          <div className="flex-1 relative max-w-[calc(100%-100px)]">
             <input
               type="range"
               min="0"

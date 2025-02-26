@@ -11,8 +11,7 @@ export interface YouTubePlayer extends YT.Player {}
 /**
  * YouTube player event object.
  */
-export interface YouTubeEvent {
-  target: YT.Player;
+export interface YouTubeEvent extends YT.PlayerEvent {
   data: number;
 }
 

@@ -72,7 +72,18 @@ export default function ChartDetail() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">{chart.song_title}</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold mb-4">{chart.song_title}</h1>
+        <ChartActions
+          chartId={chart.id}
+          onDelete={deleteChart}
+          onPlay={() => {}}
+          onPause={() => {}}
+          onReset={() => {}}
+          isPlaying={false}
+          canEdit={true}
+        />
+      </div>
       <div className="max-w-3xl mb-16">
         <YouTubePlayer
           videoId={chart.video_id}
@@ -87,18 +98,7 @@ export default function ChartDetail() {
           bars={chart.bars}
         />
       </div>
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">Bars</h1>
-        <ChartActions
-          chartId={chart.id}
-          onDelete={deleteChart}
-          onPlay={() => {}}
-          onPause={() => {}}
-          onReset={() => {}}
-          isPlaying={false}
-          canEdit={true}
-        />
-      </div>
+      <h1 className="text-2xl font-semibold">Bars</h1>
       <BarsList bars={chart.bars} currentTime={currentTime} />
     </div>
   );

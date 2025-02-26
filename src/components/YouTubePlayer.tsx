@@ -76,7 +76,10 @@ export function YouTubePlayer({
   };
 
   const initPlayer = () => {
-    playerRef.current = new window.YT.Player("youtube-player", {
+    const element = document.getElementById("youtube-player");
+    if (!element) return;
+
+    playerRef.current = new window.YT.Player(element, {
       videoId,
       height,
       width,
@@ -86,17 +89,13 @@ export function YouTubePlayer({
         rel: 0,
       },
       events: {
-        onReady: (event: YouTubeEvent) => {
-          if (onPlayerReady) {
-            onPlayerReady(event.target);
-          }
-          handlePlayerStateChange(event);
+        onReady: (event: YT.PlayerEvent) => {
+          if (onPlayerReady) onPlayerReady(event.target);
+          handlePlayerStateChange(event as YouTubeEvent);
         },
-        onStateChange: (event: YouTubeEvent) => {
-          if (onStateChange) {
-            onStateChange(event);
-          }
-          handlePlayerStateChange(event);
+        onStateChange: (event: YT.PlayerEvent) => {
+          onStateChange(event as YouTubeEvent);
+          handlePlayerStateChange(event as YouTubeEvent);
         },
       },
     });
