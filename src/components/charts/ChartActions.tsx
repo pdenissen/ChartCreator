@@ -2,12 +2,37 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 
+/**
+ * @fileoverview Component for chart playback and editing controls.
+ * @package
+ */
+
 interface ChartActionsProps {
   chartId: number;
   onDelete: () => void;
+  onPlay: () => void;
+  onPause: () => void;
+  onReset: () => void;
+  isPlaying: boolean;
+  canEdit: boolean;
 }
 
-export function ChartActions({ chartId, onDelete }: ChartActionsProps) {
+/**
+ * Renders control buttons for chart playback and editing.
+ * Provides play, pause, reset, and edit functionality.
+ *
+ * @param {ChartActionsProps} props - The component props
+ * @return {JSX.Element} The rendered component
+ */
+export function ChartActions({
+  chartId,
+  onDelete,
+  onPlay,
+  onPause,
+  onReset,
+  isPlaying,
+  canEdit,
+}: ChartActionsProps) {
   return (
     <div className="space-x-4">
       <Link href={`/charts/${chartId}/edit`}>

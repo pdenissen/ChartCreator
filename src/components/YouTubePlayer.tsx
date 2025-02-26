@@ -2,19 +2,47 @@
 
 import { useEffect, useRef } from "react";
 import type { YouTubeEvent, YouTubePlayer as YTPlayer } from "@/types/youtube";
+import YouTube from "react-youtube";
 
+/**
+ * @fileoverview YouTube player component that handles video playback and
+ * synchronization with rhythm charts.
+ * @package
+ */
+
+/**
+ * YouTubePlayer component props interface.
+ * @interface
+ */
 interface YouTubePlayerProps {
+  /** YouTube video ID to play */
   videoId: string;
-  onStateChange?: (event: YouTubeEvent) => void;
-  onTimeUpdate?: (time: number) => void;
-  onPlayerReady?: (player: YTPlayer) => void;
+  /** Callback fired when player state changes */
+  onStateChange: (event: YouTubeEvent) => void;
+  /** Callback fired periodically with current playback time */
+  onTimeUpdate: (time: number) => void;
+  /** Callback fired when player is ready */
+  onPlayerReady?: (player: YT.Player) => void;
+  /** Height of the player (default: 360) */
+  height?: number;
+  /** Width of the player (default: 640) */
+  width?: number;
 }
 
+/**
+ * A React component that embeds and controls a YouTube video player.
+ * Handles video playback and provides methods for controlling the video.
+ *
+ * @param {YouTubePlayerProps} props - The component props
+ * @return {JSX.Element} The rendered component
+ */
 export function YouTubePlayer({
   videoId,
   onStateChange,
   onTimeUpdate,
   onPlayerReady,
+  height = 360,
+  width = 640,
 }: YouTubePlayerProps) {
   const playerRef = useRef<YTPlayer | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -50,8 +78,8 @@ export function YouTubePlayer({
   const initPlayer = () => {
     playerRef.current = new window.YT.Player("youtube-player", {
       videoId,
-      height: "360",
-      width: "640",
+      height,
+      width,
       playerVars: {
         autoplay: 0,
         modestbranding: 1,
@@ -62,6 +90,7 @@ export function YouTubePlayer({
           if (onPlayerReady) {
             onPlayerReady(event.target);
           }
+          handlePlayerStateChange(event);
         },
         onStateChange: (event: YouTubeEvent) => {
           if (onStateChange) {
@@ -93,8 +122,21 @@ export function YouTubePlayer({
   };
 
   return (
-    <div className="mb-4 relative w-full aspect-video max-w-3xl mx-auto">
-      <div id="youtube-player" className="absolute inset-0"></div>
+    <div className="mb-4 relative w-full aspect-[18/9] max-w-3xl">
+      <div id="youtube-player" className="absolute inset-0">
+        <YouTube
+          videoId={videoId}
+          onReady={handlePlayerStateChange}
+          onStateChange={onStateChange}
+          opts={{
+            width: "100%",
+            height: "100%",
+            playerVars: {
+              controls: 0, // Hide default controls
+            },
+          }}
+        />
+      </div>
     </div>
   );
 }

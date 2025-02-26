@@ -3,31 +3,32 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { YouTubePlayer } from "@/components/charts/YouTubePlayer";
+import { YouTubePlayer } from "@/components/YouTubePlayer";
 import { BarsList } from "@/components/charts/BarsList";
 import { ChartActions } from "@/components/charts/ChartActions";
-import type { DrumChart } from "@/types/chart";
+import type { Chart } from "@/types/chart";
 import type { YouTubeEvent } from "@/types/youtube";
-
-declare global {
-  interface Window {
-    YT: any;
-    onYouTubeIframeAPIReady: () => void;
-  }
-}
+import { VideoControls } from "@/components/VideoControls";
 
 export default function ChartDetail() {
   const params = useParams();
   const router = useRouter();
-  const [chart, setChart] = useState<DrumChart | null>(null);
+  const [chart, setChart] = useState<Chart | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
+  const [player, setPlayer] = useState<YT.Player | null>(null);
+  const [duration, setDuration] = useState(0);
 
   useEffect(() => {
     fetchChart();
   }, []);
 
+  const handlePlayerReady = (player: YT.Player) => {
+    setPlayer(player);
+    setDuration(player.getDuration());
+  };
+
   const onPlayerStateChange = (event: YouTubeEvent) => {
-    // Optional: handle state changes if needed
+    // Update playing state if needed
   };
 
   const onTimeUpdate = (time: number) => {
@@ -72,14 +73,31 @@ export default function ChartDetail() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">{chart.song_title}</h1>
-      <YouTubePlayer
-        videoId={chart.video_id}
-        onStateChange={onPlayerStateChange}
-        onTimeUpdate={onTimeUpdate}
-      />
+      <div className="max-w-3xl mb-16">
+        <YouTubePlayer
+          videoId={chart.video_id}
+          onStateChange={onPlayerStateChange}
+          onTimeUpdate={onTimeUpdate}
+          onPlayerReady={handlePlayerReady}
+        />
+        <VideoControls
+          player={player}
+          currentTime={currentTime}
+          duration={duration}
+          bars={chart.bars}
+        />
+      </div>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Bars</h1>
-        <ChartActions chartId={chart.id} onDelete={deleteChart} />
+        <ChartActions
+          chartId={chart.id}
+          onDelete={deleteChart}
+          onPlay={() => {}}
+          onPause={() => {}}
+          onReset={() => {}}
+          isPlaying={false}
+          canEdit={true}
+        />
       </div>
       <BarsList bars={chart.bars} currentTime={currentTime} />
     </div>

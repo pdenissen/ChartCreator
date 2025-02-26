@@ -1,26 +1,36 @@
+/**
+ * @fileoverview Type definitions for YouTube IFrame API integration.
+ * @package
+ */
+
+/**
+ * YouTube Player instance from IFrame API.
+ */
+export interface YouTubePlayer extends YT.Player {}
+
+/**
+ * YouTube player event object.
+ */
 export interface YouTubeEvent {
-  target: YouTubePlayer;
+  target: YT.Player;
   data: number;
 }
 
-export interface YouTubePlayer {
-  destroy: () => void;
-  getCurrentTime: () => number;
-  playVideo: () => void;
-  pauseVideo: () => void;
-  seekTo: (seconds: number) => void;
+/**
+ * YouTube player states.
+ */
+export enum YouTubePlayerState {
+  UNSTARTED = -1,
+  ENDED = 0,
+  PLAYING = 1,
+  PAUSED = 2,
+  BUFFERING = 3,
+  CUED = 5,
 }
 
 declare global {
   interface Window {
-    YT: {
-      Player: any;
-      PlayerState: {
-        PLAYING: number;
-        PAUSED: number;
-        ENDED: number;
-      };
-    };
+    YT: typeof YT;
     onYouTubeIframeAPIReady: () => void;
   }
 }
