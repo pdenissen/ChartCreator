@@ -9,6 +9,7 @@ import { ChartActions } from "@/components/charts/ChartActions";
 import type { Chart, Bar } from "@/types/chart";
 import type { YouTubeEvent } from "@/types/youtube";
 import { VideoControls } from "@/components/VideoControls";
+import Link from "next/link";
 
 export default function ChartDetail() {
   const params = useParams();
@@ -78,6 +79,37 @@ export default function ChartDetail() {
     }
   }
 
+  function BarsSection({
+    bars,
+    chartId,
+    currentTime,
+  }: {
+    bars: Bar[];
+    chartId: string | number;
+    currentTime: number;
+  }) {
+    if (bars.length > 0) {
+      return (
+        <>
+          <h1 className="text-2xl font-semibold">Bars</h1>
+          <BarsList bars={bars} currentTime={currentTime} />
+        </>
+      );
+    }
+    return (
+      <div className="flex flex-col items-start justify-center py-8">
+        <Link href={`/charts/${chartId}/edit`}>
+          <button
+            className="px-6 py-2 rounded font-semibold transition-colors bg-black text-white dark:bg-white dark:text-black hover:bg-gray-900 dark:hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
+            aria-label="Add Bars to this chart"
+          >
+            Add Bars
+          </button>
+        </Link>
+      </div>
+    );
+  }
+
   if (!chart) {
     return <div>Loading...</div>;
   }
@@ -110,8 +142,7 @@ export default function ChartDetail() {
           bars={bars}
         />
       </div>
-      <h1 className="text-2xl font-semibold">Bars</h1>
-      <BarsList bars={bars} currentTime={currentTime} />
+      <BarsSection bars={bars} chartId={chart.id} currentTime={currentTime} />
     </div>
   );
 }

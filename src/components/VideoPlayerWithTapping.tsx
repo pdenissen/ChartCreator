@@ -69,7 +69,7 @@ export function VideoPlayerWithTapping({
   };
 
   const handleSave = async () => {
-    if (!songTitle.trim()) {
+    if (existingChart == null && !songTitle.trim()) {
       alert("Please enter a song title before saving.");
       return;
     }
@@ -104,8 +104,10 @@ export function VideoPlayerWithTapping({
           })
           .eq("id", existingChart.id)
           .eq("user_id", user.id)
-          .select()
-          .single();
+          .select();
+        if (chartResult.data && Array.isArray(chartResult.data)) {
+          chartResult.data = chartResult.data[0];
+        }
         if (chartResult.error) throw chartResult.error;
         chartId = existingChart.id;
         // Delete old bars
@@ -125,10 +127,16 @@ export function VideoPlayerWithTapping({
               user_id: user.id,
             },
           ])
-          .select()
-          .single();
+          .select();
+        let chartData = chartResult.data;
+        if (Array.isArray(chartData)) {
+          chartData = chartData[0];
+        }
         if (chartResult.error) throw chartResult.error;
-        chartId = chartResult.data.id;
+        if (!chartData || Array.isArray(chartData) || !("id" in chartData)) {
+          throw new Error("Failed to get chart id after insert");
+        }
+        chartId = (chartData as { id: string }).id;
       }
 
       // Insert bars with chart_id
@@ -163,13 +171,15 @@ export function VideoPlayerWithTapping({
         onPlayerReady={onPlayerReady}
         onTimeUpdate={() => {}}
       />
-      <Input
-        type="text"
-        placeholder="Enter song title"
-        value={songTitle}
-        onChange={(e) => setSongTitle(e.target.value)}
-        className="mb-2"
-      />
+      {existingChart == null && (
+        <Input
+          type="text"
+          placeholder="Enter song title"
+          value={songTitle}
+          onChange={(e) => setSongTitle(e.target.value)}
+          className="mb-2"
+        />
+      )}
       <div className="flex space-x-2">
         <Input
           type="text"
