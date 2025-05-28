@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/lib/supabase";
 import { YouTubePlayer } from "@/components/YouTubePlayer";
 import type { YouTubeEvent, YouTubePlayer as YTPlayer } from "@/types/youtube";
+import { Modal } from "@/components/ui/modal";
 
 interface Bar {
   time: number;
@@ -33,6 +34,11 @@ export function VideoPlayerWithTapping({
   const [songTitle, setSongTitle] = useState(existingChart?.song_title || "");
   const [isSaving, setIsSaving] = useState(false);
   const playerRef = useRef<YT.Player | null>(null);
+  const [modal, setModal] = useState<{
+    title: string;
+    message: string;
+    isOpen: boolean;
+  }>({ title: "", message: "", isOpen: false });
 
   const onPlayerStateChange = (event: YouTubeEvent) => {
     setIsPlaying(event.data === window.YT.PlayerState.PLAYING);
@@ -70,7 +76,11 @@ export function VideoPlayerWithTapping({
 
   const handleSave = async () => {
     if (existingChart == null && !songTitle.trim()) {
-      alert("Please enter a song title before saving.");
+      setModal({
+        title: "Missing Song Title",
+        message: "Please enter a song title before saving.",
+        isOpen: true,
+      });
       return;
     }
 
@@ -154,10 +164,18 @@ export function VideoPlayerWithTapping({
       }
 
       console.log("Save result:", chartResult);
-      alert("Chart saved successfully!");
+      setModal({
+        title: "Success",
+        message: "Chart saved successfully!",
+        isOpen: true,
+      });
     } catch (error: any) {
       console.error("Error saving chart:", error);
-      alert(`Failed to save chart: ${error?.message || error}`);
+      setModal({
+        title: "Error",
+        message: `Failed to save chart: ${error?.message || error}`,
+        isOpen: true,
+      });
     } finally {
       setIsSaving(false);
     }
@@ -165,6 +183,12 @@ export function VideoPlayerWithTapping({
 
   return (
     <div className="space-y-4">
+      <Modal
+        title={modal.title}
+        message={modal.message}
+        isOpen={modal.isOpen}
+        onClose={() => setModal((m) => ({ ...m, isOpen: false }))}
+      />
       <YouTubePlayer
         videoId={videoId}
         onStateChange={onPlayerStateChange}

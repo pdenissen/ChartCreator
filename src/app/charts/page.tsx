@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
+import { Modal } from "@/components/ui/modal";
 
 interface DrumChart {
   id: number;
@@ -16,6 +17,11 @@ export default function ChartsList() {
   const [charts, setCharts] = useState<DrumChart[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const [modal, setModal] = useState<{
+    title: string;
+    message: string;
+    isOpen: boolean;
+  }>({ title: "", message: "", isOpen: false });
 
   useEffect(() => {
     fetchCharts();
@@ -49,7 +55,11 @@ export default function ChartsList() {
       setCharts(data || []);
     } catch (error) {
       console.error("Error fetching charts:", error);
-      alert("Failed to fetch charts. Please try again.");
+      setModal({
+        title: "Error",
+        message: "Failed to fetch charts. Please try again.",
+        isOpen: true,
+      });
     } finally {
       setLoading(false);
     }
@@ -83,10 +93,18 @@ export default function ChartsList() {
         }
 
         setCharts(charts.filter((chart) => chart.id !== id));
-        alert("Chart deleted successfully!");
+        setModal({
+          title: "Success",
+          message: "Chart deleted successfully!",
+          isOpen: true,
+        });
       } catch (error) {
         console.error("Error deleting chart:", error);
-        alert("Failed to delete chart. Please try again.");
+        setModal({
+          title: "Error",
+          message: "Failed to delete chart. Please try again.",
+          isOpen: true,
+        });
       }
     }
   }
@@ -97,6 +115,12 @@ export default function ChartsList() {
 
   return (
     <div className="container mx-auto p-4">
+      <Modal
+        title={modal.title}
+        message={modal.message}
+        isOpen={modal.isOpen}
+        onClose={() => setModal((m) => ({ ...m, isOpen: false }))}
+      />
       <h1 className="text-2xl font-bold mb-4">My Drum Charts</h1>
       <Link href="/">
         <Button className="mb-4">Create New Chart</Button>

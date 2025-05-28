@@ -10,6 +10,7 @@ import type { Chart, Bar } from "@/types/chart";
 import type { YouTubeEvent } from "@/types/youtube";
 import { VideoControls } from "@/components/VideoControls";
 import Link from "next/link";
+import { Modal } from "@/components/ui/modal";
 
 export default function ChartDetail() {
   const params = useParams();
@@ -19,6 +20,11 @@ export default function ChartDetail() {
   const [currentTime, setCurrentTime] = useState(0);
   const [player, setPlayer] = useState<YT.Player | null>(null);
   const [duration, setDuration] = useState(0);
+  const [modal, setModal] = useState<{
+    title: string;
+    message: string;
+    isOpen: boolean;
+  }>({ title: "", message: "", isOpen: false });
 
   useEffect(() => {
     fetchChart();
@@ -71,9 +77,17 @@ export default function ChartDetail() {
 
       if (error) {
         console.error("Error deleting chart:", error);
-        alert("Failed to delete chart. Please try again.");
+        setModal({
+          title: "Error",
+          message: "Failed to delete chart. Please try again.",
+          isOpen: true,
+        });
       } else {
-        alert("Chart deleted successfully!");
+        setModal({
+          title: "Success",
+          message: "Chart deleted successfully!",
+          isOpen: true,
+        });
         router.push("/charts");
       }
     }
@@ -116,6 +130,12 @@ export default function ChartDetail() {
 
   return (
     <div className="container mx-auto p-4">
+      <Modal
+        title={modal.title}
+        message={modal.message}
+        isOpen={modal.isOpen}
+        onClose={() => setModal((m) => ({ ...m, isOpen: false }))}
+      />
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold mb-4">{chart.song_title}</h1>
         <ChartActions
