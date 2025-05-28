@@ -118,6 +118,7 @@ This comprehensive guide outlines best practices, conventions, and standards for
     - Use Shadcn UI for consistent, accessible component design.
     - Integrate Radix UI primitives for customizable, accessible UI elements.
     - Apply composition patterns to create modular, reusable components.
+    - Colors
 
     Styling Guidelines
     - Use Tailwind CSS for styling

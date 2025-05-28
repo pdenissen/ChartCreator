@@ -122,13 +122,8 @@ src/
 - `BarsList`: Displays and manages rhythm chart bars
 - `ChartActions`: Controls for chart playback and editing
 
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+## Design
+- Swatches: https://huemint.com/brand-3/#palette=272b2d-fffffe-b5b7af-d22c56
 
 ## License
 
