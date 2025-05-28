@@ -21,13 +21,17 @@ interface ChartData {
   user_id?: string;
 }
 
+interface VideoPlayerWithTappingProps {
+  videoId: string;
+  existingChart?: ChartData | null;
+  onBack?: () => void;
+}
+
 export function VideoPlayerWithTapping({
   videoId,
   existingChart = null,
-}: {
-  videoId: string;
-  existingChart?: ChartData | null;
-}) {
+  onBack,
+}: VideoPlayerWithTappingProps) {
   const [bars, setBars] = useState<Bar[]>(existingChart?.bars || []);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentLabel, setCurrentLabel] = useState("");
@@ -231,9 +235,21 @@ export function VideoPlayerWithTapping({
           </div>
         ))}
       </div>
-      <Button onClick={handleSave} disabled={isSaving}>
-        {isSaving ? "Saving..." : "Save Chart"}
-      </Button>
+      <div className="flex gap-2 mt-4">
+        <Button onClick={handleSave} disabled={isSaving}>
+          {isSaving ? "Saving..." : "Save Chart"}
+        </Button>
+        {onBack && (
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onBack}
+            disabled={isSaving}
+          >
+            Back to My Charts
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

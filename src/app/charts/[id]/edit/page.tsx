@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { VideoPlayerWithTapping } from "@/components/VideoPlayerWithTapping";
 import { Modal } from "@/components/ui/modal";
 import { Pencil } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface ChartData {
   id: number;
@@ -156,7 +157,11 @@ export default function EditChart() {
           <Pencil className="w-5 h-5" />
         </button>
       </h1>
-      <VideoPlayerWithTapping videoId={chart.video_id} existingChart={chart} />
+      <VideoPlayerWithTapping
+        videoId={chart.video_id}
+        existingChart={chart}
+        onBack={() => router.push("/charts")}
+      />
     </div>
   );
 }
