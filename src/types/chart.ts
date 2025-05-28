@@ -26,7 +26,7 @@ export interface Chart {
   /** Unique identifier for the chart */
   id: number;
   /** Title of the chart */
-  song_title: string;
+  title: string;
   /** YouTube video ID associated with the chart */
   video_id: string;
   /** Array of bars containing rhythm patterns */

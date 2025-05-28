@@ -15,7 +15,7 @@ interface Bar {
 
 interface ChartData {
   id?: number;
-  song_title: string;
+  title: string;
   video_id: string;
   bars: Bar[];
   user_id?: string;
@@ -31,7 +31,7 @@ export function VideoPlayerWithTapping({
   const [bars, setBars] = useState<Bar[]>(existingChart?.bars || []);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentLabel, setCurrentLabel] = useState("");
-  const [songTitle, setSongTitle] = useState(existingChart?.song_title || "");
+  const [title, setTitle] = useState(existingChart?.title || "");
   const [isSaving, setIsSaving] = useState(false);
   const playerRef = useRef<YT.Player | null>(null);
   const [modal, setModal] = useState<{
@@ -75,7 +75,7 @@ export function VideoPlayerWithTapping({
   };
 
   const handleSave = async () => {
-    if (existingChart == null && !songTitle.trim()) {
+    if (existingChart == null && !title.trim()) {
       setModal({
         title: "Missing Song Title",
         message: "Please enter a song title before saving.",
@@ -108,7 +108,7 @@ export function VideoPlayerWithTapping({
         chartResult = await supabase
           .from("charts")
           .update({
-            title: songTitle.trim(),
+            title: title.trim(),
             video_id: videoId,
             user_id: user.id,
           })
@@ -132,7 +132,7 @@ export function VideoPlayerWithTapping({
           .from("charts")
           .insert([
             {
-              title: songTitle.trim(),
+              title: title.trim(),
               video_id: videoId,
               user_id: user.id,
             },
@@ -198,9 +198,9 @@ export function VideoPlayerWithTapping({
       {existingChart == null && (
         <Input
           type="text"
-          placeholder="Enter song title"
-          value={songTitle}
-          onChange={(e) => setSongTitle(e.target.value)}
+          placeholder="Enter chart title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
           className="mb-2"
         />
       )}

@@ -1,12 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, ReactNode } from "react";
 
 interface ModalProps {
   title: string;
-  message: string;
+  message?: string;
   isOpen: boolean;
   onClose: () => void;
   buttonLabel?: string;
   onAction?: () => void;
+  children?: ReactNode;
 }
 
 export function Modal({
@@ -16,6 +17,7 @@ export function Modal({
   onClose,
   buttonLabel = "OK",
   onAction,
+  children,
 }: ModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -53,22 +55,28 @@ export function Modal({
         <h2 id="modal-title" className="text-lg font-bold mb-2">
           {title}
         </h2>
-        <p id="modal-desc" className="mb-6 text-base">
-          {message}
-        </p>
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={() => {
-              onAction?.();
-              onClose();
-            }}
-            className="px-4 py-2 bg-black text-white dark:bg-white dark:text-black rounded hover:bg-gray-800 dark:hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-            autoFocus
-          >
-            {buttonLabel}
-          </button>
-        </div>
+        {children ? (
+          children
+        ) : (
+          <>
+            <p id="modal-desc" className="mb-6 text-base">
+              {message}
+            </p>
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  onAction?.();
+                  onClose();
+                }}
+                className="px-4 py-2 bg-black text-white dark:bg-white dark:text-black rounded hover:bg-gray-800 dark:hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                autoFocus
+              >
+                {buttonLabel}
+              </button>
+            </div>
+          </>
+        )}
       </form>
     </dialog>
   );
