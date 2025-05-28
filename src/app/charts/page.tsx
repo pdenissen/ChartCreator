@@ -22,10 +22,55 @@ export default function ChartsList() {
     message: string;
     isOpen: boolean;
   }>({ title: "", message: "", isOpen: false });
+  const [durations, setDurations] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchCharts();
   }, []);
+
+  useEffect(() => {
+    async function fetchDurations() {
+      if (!charts.length) {
+        console.log("No charts to fetch durations for.");
+        return;
+      }
+      const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
+      console.log("API Key:", apiKey);
+      if (!apiKey) {
+        console.log("No API key found. Skipping YouTube API fetch.");
+        return;
+      }
+      const ids = charts.map((c) => c.video_id).join(",");
+      console.log("Fetching durations for video IDs:", ids);
+      try {
+        console.log("Starting YouTube API fetch...");
+        const res = await fetch(
+          `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${ids}&key=${apiKey}`
+        );
+        const data = await res.json();
+        console.log("YouTube API response:", data);
+        const map: Record<string, string> = {};
+        for (const item of data.items || []) {
+          map[item.id] = parseISODuration(item.contentDetails.duration);
+        }
+        setDurations(map);
+      } catch (e) {
+        console.error("YouTube API fetch error:", e);
+      }
+    }
+    fetchDurations();
+  }, [charts]);
+
+  function parseISODuration(iso: string): string {
+    // e.g. PT4M13S, PT1H2M3S
+    const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+    if (!match) return "Unknown";
+    const [, h, m, s] = match;
+    const hours = h ? String(h).padStart(2, "0") : "00";
+    const mins = m ? String(m).padStart(2, "0") : "00";
+    const secs = s ? String(s).padStart(2, "0") : "00";
+    return h ? `${hours}:${mins}:${secs}` : `${mins}:${secs}`;
+  }
 
   async function fetchCharts() {
     try {
@@ -134,7 +179,16 @@ export default function ChartsList() {
               key={chart.id}
               className="border p-2 rounded flex justify-between items-center"
             >
-              <Link href={`/charts/${chart.id}`}>{chart.title}</Link>
+              <div className="flex items-start gap-4">
+                <img
+                  src={`https://img.youtube.com/vi/${chart.video_id}/mqdefault.jpg`}
+                  alt={chart.title}
+                  className="w-40 h-24 object-cover rounded"
+                />
+                <div>
+                  <Link href={`/charts/${chart.id}`}>{chart.title}</Link>
+                </div>
+              </div>
               <Button
                 variant="destructive"
                 onClick={() => deleteChart(chart.id)}

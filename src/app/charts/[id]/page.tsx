@@ -43,6 +43,7 @@ export default function ChartDetail() {
     setCurrentTime(time);
   };
 
+
   async function fetchChart() {
     const { data, error } = await supabase
       .from("charts")
@@ -105,7 +106,7 @@ export default function ChartDetail() {
     if (bars.length > 0) {
       return (
         <>
-          <h1 className="text-2xl font-semibold">Bars</h1>
+          <h2 className="text-2xl font-semibold">Bars</h2>
           <BarsList bars={bars} currentTime={currentTime} />
         </>
       );
@@ -137,7 +138,7 @@ export default function ChartDetail() {
         onClose={() => setModal((m) => ({ ...m, isOpen: false }))}
       />
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold mb-4">{chart.song_title}</h1>
+        <h1 className="text-2xl font-bold mb-4">{chart.title}</h1>
         <ChartActions
           chartId={chart.id}
           onDelete={deleteChart}
