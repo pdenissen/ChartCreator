@@ -26,15 +26,21 @@ export function YouTubeSearch({ onVideoSelect }: YouTubeSearchProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex space-x-2">
+      <form
+        className="flex space-x-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          searchYouTube();
+        }}
+      >
         <Input
           type="text"
           placeholder="Search for a YouTube video"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <Button onClick={searchYouTube}>Search</Button>
-      </div>
+        <Button type="submit">Search</Button>
+      </form>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {results.map((video) => (
           <div key={video.id.videoId} className="border rounded p-2">
