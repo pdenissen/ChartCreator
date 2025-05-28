@@ -6,12 +6,21 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { Modal } from "@/components/ui/modal";
 import { supabase } from "@/lib/supabase";
+import { XMarkIcon } from "@heroicons/react/24/solid";
 
 interface YouTubeSearchProps {
   onVideoSelect: (videoId: string) => void;
+  inputClassName?: string;
+  buttonClassName?: string;
+  large?: boolean;
 }
 
-export function YouTubeSearch({ onVideoSelect }: YouTubeSearchProps) {
+export function YouTubeSearch({
+  onVideoSelect,
+  inputClassName = "",
+  buttonClassName = "",
+  large = false,
+}: YouTubeSearchProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -117,32 +126,60 @@ export function YouTubeSearch({ onVideoSelect }: YouTubeSearchProps) {
         </div>
       </Modal>
       <form
-        className="flex space-x-2"
+        className={`flex space-x-2${large ? " w-full" : ""}`}
         onSubmit={(e) => {
           e.preventDefault();
           searchYouTube();
         }}
       >
-        <Input
-          type="text"
-          placeholder="Search for a YouTube video"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <Button type="submit">Search</Button>
+        <div className="relative flex-1">
+          <Input
+            type="text"
+            placeholder="Search for a YouTube video"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className={inputClassName}
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              aria-label="Clear search"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full bg-background hover:bg-secondary transition-colors text-secondary hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <XMarkIcon className="h-5 w-5" />
+            </button>
+          )}
+        </div>
+        <Button type="submit" className={buttonClassName}>
+          Search
+        </Button>
       </form>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
         {results.map((video) => (
-          <div key={video.id.videoId} className="border rounded p-2">
-            <img
-              src={video.snippet.thumbnails.medium.url || "/placeholder.svg"}
-              alt={video.snippet.title}
-              className="w-full"
-            />
-            <h3 className="mt-2 font-bold">{video.snippet.title}</h3>
-            <Button onClick={() => handleSelect(video)} className="mt-2">
-              Select
-            </Button>
+          <div
+            key={video.id.videoId}
+            className="group rounded-2xl bg-card border border-primary/20 shadow-lg overflow-hidden flex flex-col transition-transform hover:scale-105 hover:shadow-2xl focus-within:scale-105 outline-none"
+            tabIndex={0}
+          >
+            <div className="aspect-[16/10] w-full bg-background flex items-center justify-center overflow-hidden">
+              <img
+                src={video.snippet.thumbnails.medium.url || "/placeholder.svg"}
+                alt={video.snippet.title}
+                className="object-cover w-full h-full transition-transform group-hover:scale-105 rounded-t-2xl"
+              />
+            </div>
+            <div className="p-4 flex-1 flex flex-col">
+              <h3 className="font-semibold text-lg text-foreground mb-2 line-clamp-2">
+                {video.snippet.title}
+              </h3>
+              <Button
+                onClick={() => handleSelect(video)}
+                className="mt-auto bg-primary text-background rounded-lg shadow hover:bg-primary/90 transition-colors"
+              >
+                Select
+              </Button>
+            </div>
           </div>
         ))}
       </div>
