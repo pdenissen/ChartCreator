@@ -7,6 +7,7 @@ import { createClient } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import type { User } from "@supabase/supabase-js";
+import { SunIcon, MoonIcon } from "@heroicons/react/24/solid";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -49,34 +50,50 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          <Link href="/" className="text-xl font-bold">
+    <nav className="bg-[#232628] dark:bg-[#181a1b] border-b border-primary/20 shadow-lg mb-8">
+      <div className="max-w-5xl mx-auto px-6">
+        <div className="flex items-center justify-between h-20">
+          <Link
+            href="/"
+            className="text-2xl font-extrabold text-primary rounded-xl px-4 py-2 hover:bg-primary/10 transition-colors"
+          >
             Drum Chart Creator
           </Link>
-          <div className="space-x-4">
+          <div className="flex items-center gap-4">
             {user ? (
               <>
                 <Link href="/charts">
-                  <Button variant="ghost">My Charts</Button>
+                  <Button className="rounded-lg" variant="ghost">
+                    My Charts
+                  </Button>
                 </Link>
-                <Button onClick={handleSignOut} variant="ghost">
+                <Button
+                  onClick={handleSignOut}
+                  className="rounded-lg"
+                  variant="ghost"
+                >
                   Sign Out
                 </Button>
               </>
             ) : (
               <Link href="/auth">
-                <Button variant="ghost">Sign In</Button>
+                <Button className="rounded-lg" variant="ghost">
+                  Sign In
+                </Button>
               </Link>
             )}
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="ml-2 p-2 rounded-full border border-primary/20 bg-background shadow hover:bg-primary/10 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? (
+                <SunIcon className="h-6 w-6 text-primary" />
+              ) : (
+                <MoonIcon className="h-6 w-6 text-primary" />
+              )}
+            </button>
           </div>
-          <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700"
-          >
-            {theme === "dark" ? "🌞" : "🌙"}
-          </button>
         </div>
       </div>
     </nav>
