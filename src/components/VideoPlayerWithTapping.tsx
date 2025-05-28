@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/lib/supabase";
-import type YT from "youtube-player";
 import { YouTubePlayer } from "@/components/YouTubePlayer";
 import type { YouTubeEvent, YouTubePlayer as YTPlayer } from "@/types/youtube";
 
@@ -92,35 +91,65 @@ export function VideoPlayerWithTapping({
         throw new Error("You must be logged in to save a chart.");
       }
 
-      const chartData: ChartData = {
-        song_title: songTitle.trim(),
-        video_id: videoId,
-        bars: bars,
-        user_id: user.id,
-      };
-
-      console.log("Chart data:", chartData);
-
-      let result;
+      let chartId;
+      let chartResult;
       if (existingChart?.id) {
-        result = await supabase
-          .from("drum_charts")
-          .update(chartData)
+        // Update chart (no bars)
+        chartResult = await supabase
+          .from("charts")
+          .update({
+            title: songTitle.trim(),
+            video_id: videoId,
+            user_id: user.id,
+          })
           .eq("id", existingChart.id)
-          .eq("user_id", user.id);
+          .eq("user_id", user.id)
+          .select()
+          .single();
+        if (chartResult.error) throw chartResult.error;
+        chartId = existingChart.id;
+        // Delete old bars
+        const { error: delError } = await supabase
+          .from("bars")
+          .delete()
+          .eq("chart_id", chartId);
+        if (delError) throw delError;
       } else {
-        result = await supabase.from("drum_charts").insert([chartData]);
+        // Insert chart (no bars)
+        chartResult = await supabase
+          .from("charts")
+          .insert([
+            {
+              title: songTitle.trim(),
+              video_id: videoId,
+              user_id: user.id,
+            },
+          ])
+          .select()
+          .single();
+        if (chartResult.error) throw chartResult.error;
+        chartId = chartResult.data.id;
       }
 
-      if (result.error) {
-        throw result.error;
+      // Insert bars with chart_id
+      const barsWithChartId = bars.map((bar) => ({
+        start_time: bar.time,
+        duration: 0, // You may want to update this if you have duration info
+        taps: [], // You may want to update this if you have taps info
+        chart_id: chartId,
+      }));
+      if (barsWithChartId.length > 0) {
+        const { error: barsError } = await supabase
+          .from("bars")
+          .insert(barsWithChartId);
+        if (barsError) throw barsError;
       }
 
-      console.log("Save result:", result);
+      console.log("Save result:", chartResult);
       alert("Chart saved successfully!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving chart:", error);
-      alert(`Failed to save chart: ${error.message}`);
+      alert(`Failed to save chart: ${error?.message || error}`);
     } finally {
       setIsSaving(false);
     }
@@ -132,6 +161,7 @@ export function VideoPlayerWithTapping({
         videoId={videoId}
         onStateChange={onPlayerStateChange}
         onPlayerReady={onPlayerReady}
+        onTimeUpdate={() => {}}
       />
       <Input
         type="text"

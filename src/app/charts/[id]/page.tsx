@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { YouTubePlayer } from "@/components/YouTubePlayer";
 import { BarsList } from "@/components/charts/BarsList";
 import { ChartActions } from "@/components/charts/ChartActions";
-import type { Chart } from "@/types/chart";
+import type { Chart, Bar } from "@/types/chart";
 import type { YouTubeEvent } from "@/types/youtube";
 import { VideoControls } from "@/components/VideoControls";
 
@@ -14,6 +14,7 @@ export default function ChartDetail() {
   const params = useParams();
   const router = useRouter();
   const [chart, setChart] = useState<Chart | null>(null);
+  const [bars, setBars] = useState<Bar[]>([]);
   const [currentTime, setCurrentTime] = useState(0);
   const [player, setPlayer] = useState<YT.Player | null>(null);
   const [duration, setDuration] = useState(0);
@@ -37,7 +38,7 @@ export default function ChartDetail() {
 
   async function fetchChart() {
     const { data, error } = await supabase
-      .from("drum_charts")
+      .from("charts")
       .select("*")
       .eq("id", params.id)
       .single();
@@ -46,13 +47,24 @@ export default function ChartDetail() {
       console.error("Error fetching chart:", error);
     } else {
       setChart(data);
+      const { data: barsData, error: barsError } = await supabase
+        .from("bars")
+        .select("*")
+        .eq("chart_id", data.id)
+        .order("start_time", { ascending: true });
+      if (barsError) {
+        console.error("Error fetching bars:", barsError);
+        setBars([]);
+      } else {
+        setBars(barsData || []);
+      }
     }
   }
 
   async function deleteChart() {
     if (confirm("Are you sure you want to delete this chart?")) {
       const { error } = await supabase
-        .from("drum_charts")
+        .from("charts")
         .delete()
         .eq("id", params.id);
 
@@ -95,11 +107,11 @@ export default function ChartDetail() {
           player={player}
           currentTime={currentTime}
           duration={duration}
-          bars={chart.bars}
+          bars={bars}
         />
       </div>
       <h1 className="text-2xl font-semibold">Bars</h1>
-      <BarsList bars={chart.bars} currentTime={currentTime} />
+      <BarsList bars={bars} currentTime={currentTime} />
     </div>
   );
 }

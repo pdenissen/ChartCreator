@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 interface DrumChart {
   id: number;
-  song_title: string;
+  title: string;
   video_id: string;
 }
 
@@ -38,8 +38,8 @@ export default function ChartsList() {
       }
 
       const { data, error } = await supabase
-        .from("drum_charts")
-        .select("id, song_title, video_id")
+        .from("charts")
+        .select("id, title, video_id")
         .eq("user_id", user.id);
 
       if (error) {
@@ -73,7 +73,7 @@ export default function ChartsList() {
         }
 
         const { error } = await supabase
-          .from("drum_charts")
+          .from("charts")
           .delete()
           .eq("id", id)
           .eq("user_id", user.id);
@@ -110,7 +110,7 @@ export default function ChartsList() {
               key={chart.id}
               className="border p-2 rounded flex justify-between items-center"
             >
-              <Link href={`/charts/${chart.id}`}>{chart.song_title}</Link>
+              <Link href={`/charts/${chart.id}`}>{chart.title}</Link>
               <Button
                 variant="destructive"
                 onClick={() => deleteChart(chart.id)}
