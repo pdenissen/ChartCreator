@@ -35,7 +35,6 @@ export default function ChartsList() {
         return;
       }
       const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
-      console.log("API Key:", apiKey);
       if (!apiKey) {
         console.log("No API key found. Skipping YouTube API fetch.");
         return;

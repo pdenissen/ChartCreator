@@ -53,8 +53,6 @@ export function VideoControls({
   };
 
   useEffect(() => {
-    console.log("Bars:", bars);
-    console.log("Duration:", duration);
   }, [bars, duration]);
 
   return (

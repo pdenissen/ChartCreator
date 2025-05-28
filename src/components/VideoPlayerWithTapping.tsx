@@ -167,7 +167,6 @@ export function VideoPlayerWithTapping({
         if (barsError) throw barsError;
       }
 
-      console.log("Save result:", chartResult);
       setModal({
         title: "Success",
         message: "Chart saved successfully!",

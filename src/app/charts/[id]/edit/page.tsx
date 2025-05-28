@@ -33,9 +33,8 @@ export default function EditChart() {
   }, []);
 
   async function fetchChart() {
-    console.log("params.id:", params.id);
     const chartId = Array.isArray(params.id) ? params.id[0] : params.id;
-    console.log("chartId:", chartId);
+
     if (!chartId || typeof chartId !== "string") {
       setModal({
         title: "Error",
@@ -44,12 +43,14 @@ export default function EditChart() {
       });
       return;
     }
+
     const { data, error } = await supabase
       .from("charts")
       .select("*")
       .eq("id", chartId)
       .single();
     console.log("Supabase fetch result:", { data, error });
+
     if (error) {
       console.error("Error fetching chart:", error);
       setModal({
@@ -72,7 +73,6 @@ export default function EditChart() {
   async function handleSaveTitle() {
     if (!newTitle.trim()) return;
     setSaving(true);
-    console.log("Updating chart with id:", chart?.id);
     const { data, error } = await supabase
       .from("charts")
       .update({ title: newTitle.trim() })
