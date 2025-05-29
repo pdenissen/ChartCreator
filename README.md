@@ -1,20 +1,20 @@
-# Chart Tapping Application
+# Drum Chart Creator
 
-A Next.js application for creating and practicing rhythm charts with YouTube video integration. This application allows users to create, edit, and practice rhythm patterns synchronized with YouTube videos.
+A modern Next.js application for creating, editing, and practicing drum charts synchronized with YouTube videos. Users can tap bars in real time, group bars into sections, and manage their charts with a clean, accessible UI.
 
 ## Features
 
-- YouTube video integration and synchronization
-- Interactive rhythm chart creation and editing
-- Real-time tapping practice with scoring
-- Responsive design for desktop and mobile devices
+- Unified custom YouTube video player with timeline and bar markers
+- Interactive chart editing: tap bars, group into sections, edit titles
+- Responsive, accessible design system (Tailwind CSS, Shadcn UI, Radix UI)
+- Supabase integration for authentication and data storage
+- Secure row-level security (RLS) for user data
+- Modern, mobile-first UI with dark mode support
 
 ## Prerequisites
 
-Before you begin, ensure you have installed:
-
 - Node.js (v18.0.0 or higher)
-- npm, yarn, or pnpm package manager
+- npm, yarn, or pnpm
 - Supabase account (for database)
 
 ## Installation
@@ -68,8 +68,7 @@ CREATE TABLE bars (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   chart_id UUID REFERENCES charts(id) ON DELETE CASCADE,
   start_time DECIMAL NOT NULL,
-  duration DECIMAL NOT NULL,
-  taps DECIMAL[] DEFAULT '{}',
+  label TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
 );
 
@@ -85,6 +84,8 @@ USING (auth.uid() = user_id);
 CREATE POLICY "Users can insert their own charts"
 ON charts FOR INSERT
 WITH CHECK (auth.uid() = user_id);
+
+-- Add more policies as needed for update/delete
 ```
 
 ## Development
@@ -107,23 +108,30 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 src/
 ├── app/                    # Next.js app router pages
 ├── components/
-│   ├── charts/            # Chart-related components
-│   └── ...                # Other components
+│   ├── charts/            # Chart-related components (BarsList, SectionManager, TapBarManager, etc.)
+│   ├── ui/                # UI primitives (modal, button, input, etc.)
+│   └── VideoPlayer.tsx    # Unified YouTube video player
 ├── types/                 # TypeScript type definitions
-├── lib/                   # Library code
-│   └── supabase/         # Supabase client and utilities
+├── lib/                   # Library code (supabase client, etc.)
 └── utils/                 # Utility functions
 ```
 
 ## Key Components
 
-- `YouTubePlayer`: Handles YouTube video playback and synchronization
-- `VideoPlayerWithTapping`: Manages user input for rhythm tapping
-- `BarsList`: Displays and manages rhythm chart bars
-- `ChartActions`: Controls for chart playback and editing
+- `VideoPlayer`: Unified YouTube video player with custom controls and timeline
+- `TapBarManager`: Tap bars in real time while video plays
+- `SectionManager`: Group bars into labeled sections
+- `BarsList`: Displays and manages chart bars
+- `ChartActions`: Controls for chart management (edit, delete, etc.)
+- `Modal`, `Button`, `Input`: Accessible UI primitives (Shadcn UI, Radix UI)
 
-## Design
-- Swatches: https://huemint.com/brand-3/#palette=272b2d-fffffe-b5b7af-d22c56
+## Design System
+
+- **Tailwind CSS**: Utility-first styling for rapid, maintainable UI
+- **Shadcn UI**: Accessible, composable React UI components
+- **Radix UI**: Low-level UI primitives for accessibility and customization
+- **Dark mode**: Fully supported, with accessible color contrast
+- **Mobile-first**: Responsive layouts for all devices
 
 ## License
 
@@ -133,6 +141,8 @@ src/
 
 - Next.js team for the framework
 - YouTube API for video integration
+- Supabase for backend and authentication
+- Shadcn UI and Radix UI for accessible components
 
 ## Learn More
 
