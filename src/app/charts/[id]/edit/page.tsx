@@ -7,6 +7,8 @@ import { VideoPlayerWithTapping } from "@/components/VideoPlayerWithTapping";
 import { Modal } from "@/components/ui/modal";
 import { Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SectionManager } from "@/components/charts/SectionManager";
+import { TapBarManager } from "@/components/charts/TapBarManager";
 
 interface ChartData {
   id: number;
@@ -27,10 +29,34 @@ export default function EditChart() {
     message: string;
     isOpen: boolean;
   }>({ title: "", message: "", isOpen: false });
+  const [bars, setBars] = useState<
+    { id: number; chart_id: number; time: number; label: string }[]
+  >([]);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     fetchChart();
   }, []);
+
+  useEffect(() => {
+    if (chart) {
+      setBars(
+        chart.bars.map((bar, idx) => ({
+          id:
+            typeof (bar as any)?.id === "number"
+              ? (bar as any).id
+              : Number((bar as any)?.id) || Date.now() + idx,
+          chart_id:
+            typeof (bar as any)?.chart_id === "number"
+              ? (bar as any).chart_id
+              : Number((bar as any)?.chart_id) || chart.id,
+          time: bar.time,
+          label: bar.label,
+        }))
+      );
+    }
+  }, [chart]);
 
   async function fetchChart() {
     const chartId = Array.isArray(params.id) ? params.id[0] : params.id;
@@ -44,30 +70,51 @@ export default function EditChart() {
       return;
     }
 
-    const { data, error } = await supabase
+    // Fetch the chart
+    const { data: chartData, error: chartError } = await supabase
       .from("charts")
       .select("*")
       .eq("id", chartId)
       .single();
-    console.log("Supabase fetch result:", { data, error });
 
-    if (error) {
-      console.error("Error fetching chart:", error);
+    if (chartError) {
       setModal({
         title: "Error",
-        message: `Error fetching chart with ID ${chartId}: ${error.message}`,
+        message: `Error fetching chart with ID ${chartId}: ${chartError.message}`,
         isOpen: true,
       });
-    } else if (!data) {
-      setModal({
-        title: "Not Found",
-        message: `Chart not found for ID: ${chartId}`,
-        isOpen: true,
-      });
-    } else {
-      setChart(data);
-      setNewTitle(data.title);
+      return;
     }
+
+    // Fetch the bars for this chart
+    const { data: barsData, error: barsError } = await supabase
+      .from("bars")
+      .select("id, chart_id, start_time, label")
+      .eq("chart_id", chartId)
+      .order("start_time", { ascending: true });
+
+    if (barsError) {
+      setModal({
+        title: "Error",
+        message: `Error fetching bars: ${barsError.message}`,
+        isOpen: true,
+      });
+      return;
+    }
+
+    // Normalize bars to match expected structure
+    const bars = (barsData || []).map((bar) => ({
+      id: bar.id,
+      chart_id: bar.chart_id,
+      time: typeof bar.start_time === "number" ? bar.start_time : 0,
+      label: bar.label || "",
+    }));
+
+    setChart({
+      ...chartData,
+      bars,
+    });
+    setNewTitle(chartData.title);
   }
 
   async function handleSaveTitle() {
@@ -159,9 +206,16 @@ export default function EditChart() {
       </h1>
       <VideoPlayerWithTapping
         videoId={chart.video_id}
-        existingChart={chart}
-        onBack={() => router.push("/charts")}
+        onTimeUpdate={setCurrentTime}
+        onPlayStateChange={setIsPlaying}
       />
+      <TapBarManager
+        bars={bars}
+        onChange={setBars}
+        currentTime={currentTime}
+        isPlaying={isPlaying}
+      />
+      <SectionManager bars={bars} />
     </div>
   );
 }

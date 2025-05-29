@@ -9,13 +9,19 @@
  */
 export interface Bar {
   /** Unique identifier for the bar */
-  id: string;
-  /** Starting time of the bar in seconds */
-  startTime: number;
-  /** Duration of the bar in seconds */
-  duration: number;
-  /** Array of tap timing points within the bar */
-  taps: number[];
+  id: number;
+  /** Foreign key to the chart */
+  chart_id: number;
+  /** Time of the bar in seconds (for display and sorting) */
+  time: number;
+  /** Label for the bar (e.g., 'Verse', 'Chorus') */
+  label: string;
+  /** Starting time of the bar in seconds (legacy) */
+  startTime?: number;
+  /** Duration of the bar in seconds (legacy) */
+  duration?: number;
+  /** Array of tap timing points within the bar (legacy) */
+  taps?: number[];
 }
 
 /**

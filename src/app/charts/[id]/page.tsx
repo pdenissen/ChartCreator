@@ -43,7 +43,6 @@ export default function ChartDetail() {
     setCurrentTime(time);
   };
 
-
   async function fetchChart() {
     const { data, error } = await supabase
       .from("charts")
@@ -57,14 +56,20 @@ export default function ChartDetail() {
       setChart(data);
       const { data: barsData, error: barsError } = await supabase
         .from("bars")
-        .select("*")
+        .select("id, chart_id, start_time, label")
         .eq("chart_id", data.id)
         .order("start_time", { ascending: true });
       if (barsError) {
         console.error("Error fetching bars:", barsError);
         setBars([]);
       } else {
-        setBars(barsData || []);
+        const normalizedBars = (barsData || []).map((bar) => ({
+          ...bar,
+          time: typeof bar.start_time === "number" ? bar.start_time : 0,
+          label: bar.label || "",
+        }));
+        console.log("Normalized Bars:", normalizedBars);
+        setBars(normalizedBars);
       }
     }
   }
