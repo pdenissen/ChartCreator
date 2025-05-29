@@ -8,7 +8,6 @@ import { BarsList } from "@/components/charts/BarsList";
 import { ChartActions } from "@/components/charts/ChartActions";
 import type { Chart, Bar } from "@/types/chart";
 import type { YouTubeEvent } from "@/types/youtube";
-import { VideoControls } from "@/components/VideoControls";
 import Link from "next/link";
 import { Modal } from "@/components/ui/modal";
 
@@ -160,12 +159,6 @@ export default function ChartDetail() {
           onTimeUpdate={onTimeUpdate}
           onPlayStateChange={undefined}
           onPlayerReady={handlePlayerReady}
-        />
-        <VideoControls
-          player={player}
-          currentTime={currentTime}
-          duration={duration}
-          bars={bars}
         />
       </div>
       <BarsSection bars={bars} chartId={chart.id} currentTime={currentTime} />
