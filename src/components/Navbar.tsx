@@ -50,26 +50,31 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="bg-[#232628] dark:bg-[#181a1b] border-b border-primary/20 shadow-lg mb-8">
+    <nav className="bg-black/80 border-b border-neutral-800 mb-8">
       <div className="max-w-5xl mx-auto px-6">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16">
           <Link
             href="/"
-            className="text-2xl font-extrabold text-primary rounded-xl px-4 py-2 hover:bg-primary/10 transition-colors"
+            className="rounded px-2 py-1 hover:bg-neutral-900 transition-colors"
           >
-            Drum Chart Creator
+            <span className="text-2xl font-bold text-white tracking-tight">
+              Drum Chart Creator
+            </span>
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {user ? (
               <>
                 <Link href="/charts">
-                  <Button className="rounded-lg" variant="ghost">
+                  <Button
+                    className="rounded bg-neutral-800 text-white hover:bg-neutral-700 transition"
+                    variant="ghost"
+                  >
                     My Charts
                   </Button>
                 </Link>
                 <Button
                   onClick={handleSignOut}
-                  className="rounded-lg"
+                  className="rounded bg-neutral-800 text-white hover:bg-neutral-700 transition"
                   variant="ghost"
                 >
                   Sign Out
@@ -77,20 +82,23 @@ export default function Navbar() {
               </>
             ) : (
               <Link href="/auth">
-                <Button className="rounded-lg" variant="ghost">
+                <Button
+                  className="rounded bg-neutral-800 text-white hover:bg-neutral-700 transition"
+                  variant="ghost"
+                >
                   Sign In
                 </Button>
               </Link>
             )}
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="ml-2 p-2 rounded-full border border-primary/20 bg-background shadow hover:bg-primary/10 transition-colors"
+              className="ml-2 p-2 rounded-full border border-neutral-700 bg-neutral-900 text-white hover:bg-neutral-800 transition-colors"
               aria-label="Toggle theme"
             >
               {theme === "dark" ? (
-                <SunIcon className="h-6 w-6 text-primary" />
+                <SunIcon className="h-6 w-6" />
               ) : (
-                <MoonIcon className="h-6 w-6 text-primary" />
+                <MoonIcon className="h-6 w-6" />
               )}
             </button>
           </div>
