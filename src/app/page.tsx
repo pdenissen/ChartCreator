@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import { YouTubeSearch } from "@/components/YouTubeSearch";
-import { VideoPlayerWithTapping } from "@/components/VideoPlayerWithTapping";
+import { VideoPlayer } from "@/components/VideoPlayer";
 import { Button } from "@/components/ui/button";
 import * as Label from "@radix-ui/react-label";
 import type { Session } from "@supabase/supabase-js";
@@ -73,7 +73,7 @@ export default function Home() {
           <h2 className="text-2xl font-bold mb-4 text-foreground">
             Selected Video
           </h2>
-          <VideoPlayerWithTapping videoId={selectedVideoId} />
+          <VideoPlayer videoId={selectedVideoId} />
           <Button onClick={() => router.push("/charts")} className="mt-6">
             View My Charts
           </Button>

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { YouTubePlayer } from "@/components/YouTubePlayer";
+import { VideoPlayer } from "@/components/VideoPlayer";
 import { BarsList } from "@/components/charts/BarsList";
 import { ChartActions } from "@/components/charts/ChartActions";
 import type { Chart, Bar } from "@/types/chart";
@@ -155,10 +155,10 @@ export default function ChartDetail() {
         />
       </div>
       <div className="max-w-3xl mb-16">
-        <YouTubePlayer
+        <VideoPlayer
           videoId={chart.video_id}
-          onStateChange={onPlayerStateChange}
           onTimeUpdate={onTimeUpdate}
+          onPlayStateChange={undefined}
           onPlayerReady={handlePlayerReady}
         />
         <VideoControls

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { VideoPlayerWithTapping } from "@/components/VideoPlayerWithTapping";
+import { VideoPlayer } from "@/components/VideoPlayer";
 import { Modal } from "@/components/ui/modal";
 import { Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -204,7 +204,7 @@ export default function EditChart() {
           <Pencil className="w-5 h-5" />
         </button>
       </h1>
-      <VideoPlayerWithTapping
+      <VideoPlayer
         videoId={chart.video_id}
         onTimeUpdate={setCurrentTime}
         onPlayStateChange={setIsPlaying}
