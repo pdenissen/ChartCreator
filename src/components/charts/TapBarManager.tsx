@@ -1,16 +1,24 @@
 import { Bar } from "@/types/chart";
 import { Button } from "@/components/ui/button";
+import { XMarkIcon } from "@heroicons/react/24/solid";
+import { TrashIcon } from "@heroicons/react/24/outline";
 
 interface TapBarManagerProps {
   bars: Bar[];
-  onChange: (bars: Bar[]) => void;
+  onAddBar: (bar: Bar) => void;
+  onRemoveBar: (id: number | string) => void;
+  onLabelChange: (id: number | string, newLabel: string) => void;
+  onDeleteAllBars: () => void;
   currentTime: number;
   isPlaying: boolean;
 }
 
 export function TapBarManager({
   bars,
-  onChange,
+  onAddBar,
+  onRemoveBar,
+  onLabelChange,
+  onDeleteAllBars,
   currentTime,
   isPlaying,
 }: TapBarManagerProps) {
@@ -21,16 +29,7 @@ export function TapBarManager({
       time: currentTime,
       label: `Bar ${bars.length + 1}`,
     };
-    const updatedBars = [...bars, newBar];
-    console.log("Adding bar:", newBar);
-    console.log("Updated bars:", updatedBars);
-    onChange(updatedBars);
-  };
-
-  const handleLabelChange = (index: number, newLabel: string) => {
-    onChange(
-      bars.map((bar, i) => (i === index ? { ...bar, label: newLabel } : bar))
-    );
+    onAddBar(newBar);
   };
 
   const formatTime = (time: number) => {
@@ -51,9 +50,20 @@ export function TapBarManager({
 
   return (
     <div className="space-y-4">
-      <div className="flex space-x-2">
-        <Button onClick={handleTap} disabled={!isPlaying}>
-          Tap Bar
+      <div className="flex items-center justify-between">
+        <div className="flex space-x-2">
+          <Button onClick={handleTap} disabled={!isPlaying}>
+            Tap Bar
+          </Button>
+        </div>
+        <Button
+          onClick={onDeleteAllBars}
+          variant="destructive"
+          className="flex items-center gap-1"
+          disabled={bars.length === 0}
+        >
+          <TrashIcon className="h-5 w-5" />
+          Delete all bars
         </Button>
       </div>
       <div className="space-y-2">
@@ -63,7 +73,17 @@ export function TapBarManager({
             className="flex justify-between items-center border p-2 rounded"
           >
             <span>{bar.label}</span>
-            <span>{formatTime(bar.time)}</span>
+            <div className="flex items-center gap-2">
+              <span>{formatTime(bar.time)}</span>
+              <button
+                type="button"
+                aria-label="Remove bar"
+                onClick={() => onRemoveBar(bar.id)}
+                className="ml-2 p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900 transition-colors"
+              >
+                <XMarkIcon className="h-5 w-5 text-red-500" />
+              </button>
+            </div>
           </div>
         ))}
       </div>

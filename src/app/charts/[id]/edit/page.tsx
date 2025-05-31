@@ -144,6 +144,78 @@ export default function EditChart() {
     }
   }
 
+  // Add Bar (CREATE)
+  async function handleAddBar(newBar: {
+    id: number;
+    chart_id: number;
+    time: number;
+    label: string;
+  }) {
+    if (!chart) return;
+    const { data, error } = await supabase
+      .from("bars")
+      .insert([
+        {
+          chart_id: chart.id,
+          start_time: newBar.time,
+          label: newBar.label,
+          duration: 0,
+        },
+      ])
+      .select()
+      .single();
+    if (error) {
+      setModal({ title: "Error", message: error.message, isOpen: true });
+      return;
+    }
+    setBars((prev) => [...prev, { ...data, time: data.start_time }]);
+  }
+
+  // Remove Bar (DELETE)
+  async function handleRemoveBar(id: number | string) {
+    // If id is not a valid UUID (i.e., it's a temp number), just remove from local state
+    const isUUID = typeof id === "string" && /^[0-9a-fA-F-]{36}$/.test(id);
+    if (!isUUID) {
+      setBars((prev) => prev.filter((bar) => String(bar.id) !== String(id)));
+      return;
+    }
+    const { error } = await supabase.from("bars").delete().eq("id", id);
+    if (error) {
+      setModal({ title: "Error", message: error.message, isOpen: true });
+      return;
+    }
+    setBars((prev) => prev.filter((bar) => String(bar.id) !== String(id)));
+  }
+
+  // Edit Bar Label (UPDATE)
+  async function handleLabelChange(id: number, newLabel: string) {
+    const { error } = await supabase
+      .from("bars")
+      .update({ label: newLabel })
+      .eq("id", id);
+    if (error) {
+      setModal({ title: "Error", message: error.message, isOpen: true });
+      return;
+    }
+    setBars((prev) =>
+      prev.map((bar) => (bar.id === id ? { ...bar, label: newLabel } : bar))
+    );
+  }
+
+  // Delete All Bars
+  async function handleDeleteAllBars() {
+    if (!chart) return;
+    const { error } = await supabase
+      .from("bars")
+      .delete()
+      .eq("chart_id", chart.id);
+    if (error) {
+      setModal({ title: "Error", message: error.message, isOpen: true });
+      return;
+    }
+    setBars([]);
+  }
+
   if (!chart) {
     return <div>Loading...</div>;
   }
@@ -211,7 +283,10 @@ export default function EditChart() {
       />
       <TapBarManager
         bars={bars}
-        onChange={setBars}
+        onAddBar={handleAddBar}
+        onRemoveBar={handleRemoveBar}
+        onLabelChange={handleLabelChange}
+        onDeleteAllBars={handleDeleteAllBars}
         currentTime={currentTime}
         isPlaying={isPlaying}
       />

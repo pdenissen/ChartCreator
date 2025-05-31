@@ -28,6 +28,8 @@ interface VideoPlayerProps {
   className?: string;
   children?: React.ReactNode;
   bars?: { time: number }[];
+  onTimeUpdate?: (currentTime: number) => void;
+  onPlayStateChange?: (isPlaying: boolean) => void;
 }
 
 export function VideoPlayer({
@@ -38,6 +40,8 @@ export function VideoPlayer({
   className = "",
   children,
   bars = [],
+  onTimeUpdate,
+  onPlayStateChange,
 }: VideoPlayerProps) {
   const playerRef = useRef<YTPlayer | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -55,6 +59,18 @@ export function VideoPlayer({
       if (playerRef.current) playerRef.current.destroy();
     };
   }, [videoId]);
+
+  useEffect(() => {
+    if (typeof onTimeUpdate === "function") {
+      onTimeUpdate(currentTime);
+    }
+  }, [currentTime]);
+
+  useEffect(() => {
+    if (typeof onPlayStateChange === "function") {
+      onPlayStateChange(isPlaying);
+    }
+  }, [isPlaying]);
 
   const initYouTubeAPI = () => {
     if (!window.YT) {
